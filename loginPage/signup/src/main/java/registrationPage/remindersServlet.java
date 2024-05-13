@@ -79,7 +79,7 @@ public class remindersServlet extends HttpServlet {
                 			+ "	content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />\r\n"
                 			+ "<meta name=\"description\" content=\"\" />\r\n"
                 			+ "<meta name=\"author\" content=\"\" />\r\n"
-                			+ "<title>Diet Helpers Web</title>\r\n"
+                			+ "<title>Reminders</title>\r\n"
                 			+ "\r\n"
                 			+ "<!-- Favicon-->\r\n"
                 			+ "<link rel=\"icon\" type=\"image/x-icon\" href=\"assets/favicon.ico\" />\r\n"

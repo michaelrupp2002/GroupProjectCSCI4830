@@ -1,0 +1,229 @@
+package registrationPage;
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.*;
+import java.util.*;
+import com.opencsv.CSVReader;
+
+
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.*;
+import java.util.*;
+import com.opencsv.CSVReader;
+
+@WebServlet("/dailyTracking")
+
+public class dailyTracking extends HttpServlet {
+    private ArrayList<String[]> caloriesData;
+    private HashMap<String, Integer> selectedItems;
+
+    @Override
+    public void init() throws ServletException {
+        String caloriesFile = getServletContext().getRealPath("/WEB-INF/lib/caloriesData.csv");
+
+        caloriesData = new ArrayList<>();
+        selectedItems = new HashMap<>();
+
+        try (CSVReader reader = new CSVReader(new FileReader(caloriesFile))) {
+            String[] line;
+            while ((line = reader.readNext()) != null) {
+                line[1] = line[1].replaceAll("cal", "");
+                caloriesData.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        String meal = request.getParameter("meal");
+    	out.println("<!DOCTYPE html>\r\n"
+    			+ "<html lang=\"en\">\r\n"
+    			+ "<head>\r\n"
+    			+ "<meta charset=\"utf-8\" />\r\n"
+    			+ "<meta name=\"viewport\"\r\n"
+    			+ "	content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />\r\n"
+    			+ "<meta name=\"description\" content=\"\" />\r\n"
+    			+ "<meta name=\"author\" content=\"\" />\r\n"
+    			+ "<title>Diet Helpers Web</title>\r\n"
+    			+ "\r\n"
+    			+ "<!-- Favicon-->\r\n"
+    			+ "<link rel=\"icon\" type=\"image/x-icon\" href=\"assets/favicon.ico\" />\r\n"
+    			+ "\r\n"
+    			+ "	\r\n"
+    			+ "<!-- Core theme CSS (includes Bootstrap)-->\r\n"
+    			+ "<link href=\"css/index-styles.css\" rel=\"stylesheet\" />\r\n"
+    			+ "</head>\r\n"
+    			+ "<body id=\"page-top\">\r\n"
+    			+ "	<!-- Navigation-->\r\n"
+    			+ "	<nav\r\n"
+    			+ "		class=\"navbar navbar-expand-lg bg-secondary text-uppercase fixed-top\"\r\n"
+    			+ "		id=\"mainNav\">\r\n"
+    			+ "		<div class=\"container\">\r\n"
+    			+ "			<a class=\"navbar-brand\" href=\"#page-top\">Diet Helpers</a>\r\n"
+    			+ "			<button\r\n"
+    			+ "				class=\"navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded\"\r\n"
+    			+ "				type=\"button\" data-bs-toggle=\"collapse\"\r\n"
+    			+ "				data-bs-target=\"#navbarResponsive\" aria-controls=\"navbarResponsive\"\r\n"
+    			+ "				aria-expanded=\"false\" aria-label=\"Toggle navigation\">\r\n"
+    			+ "				Menu <i class=\"fas fa-bars\"></i>\r\n"
+    			+ "			</button>\r\n"
+    			+ "			<div class=\"collapse navbar-collapse\" id=\"navbarResponsive\">\r\n"
+    			+ "				<ul class=\"navbar-nav ms-auto\">\r\n"
+    			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+
+    			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"reminders\">Reminders</a></li>\r\n"
+    			+ "<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+    			+ "					class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"calorieIntake.html\">Recomendations</a></li>"
+    			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+    			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"dailyTracking.html\">Daily Tracking</a></li>\r\n"
+    			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+    			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"Logout\">Logout</a></li>\r\n"
+    			+ "					<li class=\"nav-item mx-0 mx-lg-1 bg-danger\"><a\r\n"
+    			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"index.jsp\">Home</a><li>\r\n"
+    			+ "					\r\n"
+    			+ "				</ul>\r\n"
+    			+ "			</div>\r\n"
+    			+ "		</div>\r\n"
+    			+ "	</nav>");
+    	
+        out.println("<br>");
+        out.println("<br>");
+        out.println("<br>");
+        out.println("<br>");
+        out.println("<br>");
+        
+        
+        if ("morning".equals(meal)) {
+            out.println("<body style='text-align: center; background-color: #1abc9c; margin-top: 120px;'>");
+            
+            // Display recommended calorie intake range for Breakfast with bigger and upper text
+            out.println("<h2 style='text-transform: uppercase; font-size: 24px;'>Recommended Calorie Intake Range in Breakfast: 200-400 calories</h2>");
+            
+            out.println("<form method='post'>");
+            out.println("<select name='foodItem'>");
+            for (String[] data : caloriesData) {
+                int calories = Integer.parseInt(data[1].trim().replaceAll("[^0-9]", "0"));
+                if (calories >= 200 && calories <= 400) {
+                    out.println("<option value='" + data[0] + "'>" + data[0] + " " + data[1] + "</option>");
+                }
+            }
+            out.println("</select>");
+            out.println("<input type='submit' value='Add to Total Calories'>");
+            out.println("</form>");
+        }
+            out.println("</select>");
+            out.println("<input type='submit' value='Add to Total Calories'>");
+            out.println("</form>");
+
+            // Display total calories for dinner meal
+            int totalCalories = 0;
+            for (Map.Entry<String, Integer> entry : selectedItems.entrySet()) {
+                totalCalories += entry.getValue();
+            }
+            out.println("Total Calories: " + totalCalories);
+        } else if ("afternoon".equals(meal)) {
+            // Display recommended calorie intake range for Lunch
+            out.println("Recommended Calorie Intake Range in Lunch: 500-700 calories");
+            out.println("<form method='post'>");
+            out.println("<select name='foodItem'>");
+            for (String[] data : caloriesData) {
+                int calories = Integer.parseInt(data[1].trim().replaceAll("[^0-9]", "0"));
+                if (calories >= 500 && calories <= 700) {
+                    out.println("<option value='" + data[0] + "'>" + data[0] + " " + data[1] + "</option>");
+                }
+            }
+            out.println("</select>");
+            out.println("<input type='submit' value='Add to Total Calories'>");
+            out.println("</form>");
+
+            // Display total calories for dinner meal
+            int totalCalories = 0;
+            for (Map.Entry<String, Integer> entry : selectedItems.entrySet()) {
+                totalCalories += entry.getValue();
+            }
+            out.println("Total Calories: " + totalCalories);
+        } else if ("night".equals(meal)) {
+            // Display recommended calorie intake range for dinner
+            out.println("Recommended Calorie Intake Range at Dinner: 500-700 calories");
+            out.println("<form method='post'>");
+            out.println("<select name='foodItem'>");
+            for (String[] data : caloriesData) {
+                int calories = Integer.parseInt(data[1].trim().replaceAll("[^0-9]", "0"));
+                if (calories >= 500 && calories <= 700) {
+                    out.println("<option value='" + data[0] + "'>" + data[0] + " " + data[1] + "</option>");
+                }
+            }
+            out.println("</select>");
+            out.println("<input type='submit' value='Add to Total Calories'>");
+            out.println("</form>");
+
+            // Display total calories for dinner meal
+            int totalCalories = 0;
+            for (Map.Entry<String, Integer> entry : selectedItems.entrySet()) {
+                totalCalories += entry.getValue();
+            }
+            out.println("Total Calories: " + totalCalories);
+        }
+        out.println("<form method='post'>");
+        out.println("<input type='submit' name='reset' value='Reset Total Calories'>");
+        out.println("</form>");
+        out.println("</body>");
+    }
+    
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        String foodItem = request.getParameter("foodItem");
+
+        int addedCalories = 0;
+        for (String[] data : caloriesData) {
+            if (data[0].equals(foodItem)) {
+                addedCalories = Integer.parseInt(data[1].trim().replaceAll("[^0-9]", "0"));
+                if (selectedItems.containsKey(foodItem)) {
+                    addedCalories += selectedItems.get(foodItem);
+                }
+                selectedItems.put(foodItem, addedCalories);
+                break;
+            }
+        }
+        if (request.getParameter("reset") != null) {
+            selectedItems.clear();
+            out.println("Total Calories reset to 0.");
+        }
+
+        // Check if total calories are below recommended, above recommended, or within range
+        int totalCalories = 0;
+        for (int cal : selectedItems.values()) {
+            totalCalories += cal;
+        }
+
+        if ("morning".equals(request.getParameter("meal"))) {
+            if (totalCalories < 200) {
+                out.println("Total Calories is below recommended intake.");
+            } else if (totalCalories > 400) {
+                out.println("Total Calories is above recommended intake.");
+            }
+            // Redirect back to doGet for morning meal
+            response.sendRedirect(request.getContextPath() + "/dailyTracking?meal=morning");
+        } else if ("afternoon".equals(request.getParameter("meal"))) {
+            if (totalCalories < 500 || totalCalories > 700) {
+                out.println("Total Calories should be between 500 and 700 for the afternoon meal.");
+            }
+            // Redirect back to doGet for afternoon meal
+            response.sendRedirect(request.getContextPath() + "/dailyTracking?meal=afternoon");
+        } else if ("night".equals(request.getParameter("meal"))) {
+            if (totalCalories < 500 || totalCalories > 700) {
+                out.println("Total Calories should be between 500 and 700 for the dinner meal.");
+            }
+            // Redirect back to doGet for dinner meal
+            response.sendRedirect(request.getContextPath() + "/dailyTracking?meal=night");
+        }
+    }
+}

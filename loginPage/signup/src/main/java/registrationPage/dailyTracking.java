@@ -92,17 +92,24 @@ public class dailyTracking extends HttpServlet {
     			+ "			</div>\r\n"
     			+ "		</div>\r\n"
     			+ "	</nav>");
+    	
         out.println("<br>");
         out.println("<br>");
         out.println("<br>");
         out.println("<br>");
         out.println("<br>");
-
+        
+        
         if ("morning".equals(meal)) {
-
+            out.println("<body style='text-align: center; background-color: #1abc9c; margin-top: 40px;'>");
             
-            // Display recommended calorie intake range for Breakfast
-            out.println("Recommended Calorie Intake Range in Breakfast: 200-400 calories");
+            // Display recommended calorie intake range for Breakfast in a colorful rectangle with bigger text
+            out.println("<div style='background-color: #29a329; padding: 10px; border-radius: 5px;'>");
+            out.println("<h2 style='font-size: 28px; color: white;'>Recommended Calorie Intake Range in Breakfast: 200-400 calories</h2>");
+            out.println("</div>");
+            out.println("<br>");
+            out.println("<br>");
+            
             out.println("<form method='post'>");
             out.println("<select name='foodItem'>");
             for (String[] data : caloriesData) {
@@ -114,6 +121,8 @@ public class dailyTracking extends HttpServlet {
             out.println("</select>");
             out.println("<input type='submit' value='Add to Total Calories'>");
             out.println("</form>");
+        
+
 
             // Display total calories for dinner meal
             int totalCalories = 0;
@@ -122,8 +131,15 @@ public class dailyTracking extends HttpServlet {
             }
             out.println("Total Calories: " + totalCalories);
         } else if ("afternoon".equals(meal)) {
+        	 out.println("<body style='text-align: center; background-color: #1abc9c; margin-top: 40px;'>");
+        	 
             // Display recommended calorie intake range for Lunch
-            out.println("Recommended Calorie Intake Range in Lunch: 500-700 calories");
+            out.println("<div style='background-color: #29a329; padding: 10px; border-radius: 5px;'>");
+            out.println("<h2 style='font-size: 28px; color: white;'>Recommended Calorie Intake Range in Lunch: 500-700 calories</h2>");
+            out.println("</div>");
+            out.println("<br>");
+            out.println("<br>");
+
             out.println("<form method='post'>");
             out.println("<select name='foodItem'>");
             for (String[] data : caloriesData) {
@@ -143,8 +159,15 @@ public class dailyTracking extends HttpServlet {
             }
             out.println("Total Calories: " + totalCalories);
         } else if ("night".equals(meal)) {
+        	 out.println("<body style='text-align: center; background-color: #1abc9c; margin-top: 40px;'>");
+        	
             // Display recommended calorie intake range for dinner
-            out.println("Recommended Calorie Intake Range at Dinner: 500-700 calories");
+            out.println("<div style='background-color: #29a329; padding: 10px; border-radius: 5px;'>");
+            out.println("<h2 style='font-size: 28px; color: white;'>Recommended Calorie Intake Range at Dinner: 500-700 calories</h2>");
+            out.println("</div>");
+            out.println("<br>");
+            out.println("<br>");
+      
             out.println("<form method='post'>");
             out.println("<select name='foodItem'>");
             for (String[] data : caloriesData) {
@@ -164,6 +187,10 @@ public class dailyTracking extends HttpServlet {
             }
             out.println("Total Calories: " + totalCalories);
         }
+        out.println("<form method='post'>");
+        out.println("<input type='submit' name='reset' value='Reset Total Calories'>");
+        out.println("</form>");
+        out.println("</body>");
     }
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -181,6 +208,10 @@ public class dailyTracking extends HttpServlet {
                 selectedItems.put(foodItem, addedCalories);
                 break;
             }
+        }
+        if (request.getParameter("reset") != null) {
+            selectedItems.clear();
+            out.println("Total Calories reset to 0.");
         }
 
         // Check if total calories are below recommended, above recommended, or within range

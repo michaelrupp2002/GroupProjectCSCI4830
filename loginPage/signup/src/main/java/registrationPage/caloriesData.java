@@ -90,10 +90,11 @@ public class caloriesData extends HttpServlet {
         out.println("<br>");
         
         if (meal != null) {
-            out.println("<h2 align=\"center\";>" + meal + " Meal Options:</h2>");
-            out.println("<ul>");
-
-            int lowerBound = 0;
+        	out.println("<div style='background-color: green; padding: 10px; border: 2px solid black; text-align: center;'>");
+        	out.println("<h2 style='color: white;'>" + meal + " Meal Options:</h2>");
+        	out.println("</div>");
+ 
+            int lowerBound = 1;
             int upperBound = Integer.MAX_VALUE;
 
             if (meal.equals("Low-calorie")) {
@@ -110,7 +111,8 @@ public class caloriesData extends HttpServlet {
 
             for (String[] data : caloriesData) {
                 try {
-                    int calories = Integer.parseInt(data[1].trim().replaceAll("[^0-9]", ""));
+                	out.println("<body style='background-color: #1abc9c; margin-top: 10px;'>");
+                    int calories = Integer.parseInt(data[1].trim().replaceAll("[^0-9]", "0"));
                     if (calories >= lowerBound && calories <= upperBound) {
                         out.println("<li>" + data[0] + " - " + calories + " calories</li>");
                     }

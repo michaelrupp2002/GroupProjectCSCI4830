@@ -76,8 +76,7 @@
 			<div class="divider-custom divider-light">
 				<div class="divider-custom-icon">
 					<i class="fas fa-star"></i>
-				</div>
-				
+				</div>			
 			</div>
 			
 			<!-- About Section Content-->
