@@ -1,0 +1,144 @@
+package registrationPage;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.opencsv.CSVReader;
+
+@WebServlet("/caloriesServlet")
+public class caloriesServlet extends HttpServlet {
+private static final long serialVersionUID = 1L;
+
+private static final String JDBC_URL = "jdbc:mysql://ec2-3-16-149-43.us-east-2.compute.amazonaws.com:3306/UserData";
+private static final String JDBC_USER = "diethelper_remote";
+private static final String JDBC_PASSWORD = "diethelper";
+
+@Override
+public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    int totalCalories = 0;
+
+    try (CSVReader reader = new CSVReader(new FileReader("/signup/src/restaurantCalorieData - restaurantCalorieData.csv"))) {
+        String[] nextLine;
+        while ((nextLine = reader.readNext()) != null) {
+            String foodItem = nextLine[0];
+            int calories = Integer.parseInt(nextLine[1]);
+
+            // Log food item and calories for debugging
+            System.out.println("Food Item: " + foodItem + ", Calories: " + calories);
+
+            // Get selected food items for each category
+            String[] selectedFoods = request.getParameterValues(foodItem.replace(" ", "") + "Foods[]"); // Remove spaces in food item names for parameter matching
+            if (selectedFoods != null) {
+                for (String selectedFood : selectedFoods) {
+                    if (selectedFood != null && !selectedFood.isEmpty()) {
+                        totalCalories += calories;
+                    }
+                }
+            }
+
+            // Log selected foods for debugging
+            System.out.println("Selected Foods: " + Arrays.toString(selectedFoods));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    // Log total calories for debugging
+    System.out.println("Total Calories: " + totalCalories);
+
+    // Store or use the totalCalories as needed
+
+    response.sendRedirect(request.getContextPath() + "/caloriesServlet");
+}
+
+
+
+@Override
+public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    response.setContentType("text/html;charset=UTF-8");
+    PrintWriter out = response.getWriter();
+
+    // Initialize a map to store selected food items and their calories for each meal category
+    Map<String, Map<String, Integer>> mealItems = new HashMap<>();
+    mealItems.put("Breakfast", new HashMap<>());
+    mealItems.put("Lunch", new HashMap<>());
+    mealItems.put("Dinner", new HashMap<>());
+    mealItems.put("Snack", new HashMap<>());
+
+    // Display the form with search input and checkboxes for selecting food items for each meal category
+    out.println("<html><head><title>Calorie Counter</title>");
+    out.println("<script src='https://code.jquery.com/jquery-3.6.0.min.js'></script>");
+    out.println("<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>");
+    out.println("<link rel='stylesheet' href='https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'>");
+    out.println("<script>");
+    out.println("$(document).ready(function() {");
+    out.println("  var foodItems = [];");
+
+    try (CSVReader reader = new CSVReader(new FileReader("/signup/src/restaurantCalorieData - restaurantCalorieData.csv"))) {
+        String[] nextLine;
+        while ((nextLine = reader.readNext()) != null) {
+            String foodItem = nextLine[0];
+            out.println("  foodItems.push('" + foodItem + "');");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    out.println("  $('.foodSearch').autocomplete({ source: foodItems });");
+    out.println("});");
+    out.println("</script></head>");
+    out.println("<body>");
+    out.println("<h2>Select Food Items for Each Meal Category</h2>");
+
+    for (String category : mealItems.keySet()) {
+        out.println("<h3>" + category + "</h3>");
+        out.println("<form method='post'>");
+        out.println("Search for Food: <input type='text' class='foodSearch' name='" + category.toLowerCase() + "Food'><br>");
+
+        try (CSVReader reader = new CSVReader(new FileReader("/signup/src/restaurantCalorieData - restaurantCalorieData.csv"))) {
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                String foodItem = nextLine[0];
+                out.println("<input type='checkbox' name='" + category.toLowerCase() + "Foods[]' value='" + foodItem + "'>" + foodItem + "<br>");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        out.println("<input type='submit' value='Add Selected to " + category + "'>");
+        out.println("</form>");
+        out.println("<br>");
+    }
+
+    // Calculate and display the total calories for each meal category
+    // Calculate and display the overall total calories
+
+    int overallTotalCalories = mealItems.values().stream()
+            .flatMap(m -> m.values().stream())
+            .mapToInt(Integer::intValue)
+            .sum();
+
+    out.println("<h2>Total Calories for Each Meal Category</h2>");
+
+    for (String category : mealItems.keySet()) {
+        int totalCalories = mealItems.get(category).values().stream().mapToInt(Integer::intValue).sum();
+        out.println("<p>" + category + ": " + totalCalories + " calories</p>");
+    }
+
+    out.println("<h2>Overall Total Calories: " + overallTotalCalories + " calories</h2>");
+
+    out.println("</body></html>");
+}
+}

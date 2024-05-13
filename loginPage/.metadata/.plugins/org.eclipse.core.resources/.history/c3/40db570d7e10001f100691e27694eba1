@@ -1,0 +1,56 @@
+package registrationPage;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/caloriesServlet")
+public class caloriesServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Map<String, Integer> calorieMap = new HashMap<>();
+        calorieMap.put("aandw restaurantroot beer float", 224);
+        calorieMap.put("aandw restaurantdiet root beer float", 564);
+        calorieMap.put("aandw restaurantroot beer freeze", 250);
+        calorieMap.put("aandw restaurantchocolate shake", 1370);
+        calorieMap.put("aandw restaurantstrawberry shake", 944);
+        calorieMap.put("aandw restaurantdiet root beer freeze", 873);
+        calorieMap.put("aandw restaurantvanilla shake", 543);
+        calorieMap.put("aandw restaurantchicken strips 5 pieces", 943);
+        calorieMap.put("aandw restaurantchicken tender 1 piece", 435);
+        calorieMap.put("aandw restaurantvanilla soft serve cone regular", 108);
+        calorieMap.put("aandw restaurantmandms polar swirl", 371);
+
+        int totalCalories = 0;
+
+        for (String category : request.getParameterMap().keySet()) {
+            String[] selectedFoods = request.getParameterValues(category + "Foods[]");
+            if (selectedFoods != null) {
+                for (String food : selectedFoods) {
+                    totalCalories += calorieMap.get(food);
+                }
+            }
+        }
+
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+
+        out.println("<html><head><title>Total Calories</title></head><body>");
+        out.println("<h2>Total Calories: " + totalCalories + "</h2>");
+        out.println("</body></html>");
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Code for displaying the form with meal categories and food items remains the same
+    }
+}

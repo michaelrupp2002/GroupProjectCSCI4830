@@ -1,0 +1,61 @@
+package registrationPage;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.opencsv.CSVReader;
+
+@WebServlet("/caloriesServlet")
+public class caloriesServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    private static final String JDBC_URL = "jdbc:mysql://ec2-3-16-149-43.us-east-2.compute.amazonaws.com:3306/UserData";
+    private static final String JDBC_USER = "diethelper_remote";
+    private static final String JDBC_PASSWORD = "diethelper";
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String username = "username1"; // Set the username to "username1"
+        int totalCalories = 0;
+        
+        try (CSVReader reader = new CSVReader(new FileReader("/signup/src/restaurantCalorieData - restaurantCalorieData.csv"))) {
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                String foodItem = nextLine[0];
+                int calories = Integer.parseInt(nextLine[1]);
+                
+                String value = request.getParameter(foodItem);
+                if (value != null && value.equals("1")) {
+                    totalCalories += calories;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD)) {
+            // Store totalCalories in the database or use as needed
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        response.sendRedirect(request.getContextPath() + "/caloriesServlet");
+    }
+
+    Type Status Report
+
+    Message The requested resource [/signup/servlet/registrationPage.caloriesServlet] is not available
+
+    Description The origin server did not find a current representation for the target resource or is not willing to disclose that one exists.

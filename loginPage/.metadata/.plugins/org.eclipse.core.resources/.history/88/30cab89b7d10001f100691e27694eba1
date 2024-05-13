@@ -1,0 +1,83 @@
+package registrationPage;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/caloriesServlet")
+public class caloriesServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Calculation logic to calculate total calories based on selected food items
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+
+        // Initialize a map to store selected food items and their calories for each meal category
+        Map<String, Map<String, Integer>> mealItems = new HashMap<>();
+        mealItems.put("Breakfast", new HashMap<>());
+        mealItems.put("Lunch", new HashMap<>());
+        mealItems.put("Dinner", new HashMap<>());
+        mealItems.put("Snack", new HashMap<>());
+
+        out.println("<html><head><title>Calorie Counter</title>");
+        out.println("<script src='https://code.jquery.com/jquery-3.6.0.min.js'></script>");
+        out.println("<style>.foodList { display: none; position: absolute; background: #f9f9f9; border: 1px solid #ccc; max-height: 200px; overflow-y: scroll; }</style>");
+        out.println("</head><body>");
+
+        for (String category : mealItems.keySet()) {
+            out.println("<h3>" + category + "</h3>");
+            out.println("Search for Food: <input type='text' class='foodSearch' id='" + category.toLowerCase() + "FoodSearch'><br>");
+
+            String[] foods = {
+                "aandw restaurantroot beer float - 224.5",
+                "aandw restaurantdiet root beer float - 564.4",
+                "aandw restaurantroot beer freeze - 250",
+                "aandw restaurantchocolate shake - 1370",
+                "aandw restaurantstrawberry shake - 944",
+                "aandw restaurantdiet root beer freeze - 873.6",
+                "aandw restaurantvanilla shake - 543.6",
+                "aandw restaurantchicken strips 5 pieces - 943.2",
+                "aandw restaurantchicken tender 1 piece - 435",
+                "aandw restaurantvanilla soft serve cone regular - 108",
+                "aandw restaurantmandms polar swirl - 371"
+            };
+
+            out.println("<div class='foodList' id='" + category.toLowerCase() + "FoodList'>");
+            for (String food : foods) {
+                out.println("<input type='checkbox' name='" + category.toLowerCase() + "Foods[]' value='" + food.split(" - ")[0] + "'>" + food + "<br>");
+            }
+            out.println("</div>");
+
+            out.println("<script>");
+            out.println("$(document).ready(function() {");
+            out.println("$('#" + category.toLowerCase() + "FoodSearch').on('click', function() {");
+            out.println("$('.foodList').hide();");
+            out.println("$('#" + category.toLowerCase() + "FoodList').toggle();");
+            out.println("});");
+            out.println("});");
+            out.println("</script>");
+        }
+
+        // Submit button to calculate total calories
+        out.println("<form method='post'>");
+        out.println("<input type='submit' value='Calculate Total Calories'>");
+        out.println("</form>");
+
+        // Display total calories here
+
+        out.println("</body></html>");
+    }
+}

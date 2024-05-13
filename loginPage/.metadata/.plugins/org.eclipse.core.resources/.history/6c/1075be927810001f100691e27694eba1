@@ -1,0 +1,99 @@
+package registrationPage;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
+
+@WebServlet("/caloriesServlet")
+public class caloriesServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    private static final String CSV_FILE_PATH = "/path/to/restaurantCalorieData.csv"; // Update with your CSV file path
+
+    private Map<String, Integer> foodCaloriesMap; // Map to store food items and their calories
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        try {
+            loadFoodCaloriesMap();
+        } catch (CsvValidationException e) {
+            e.printStackTrace();
+        } // Load food items and their calories from CSV file
+    }
+
+    private void loadFoodCaloriesMap() throws CsvValidationException {
+        foodCaloriesMap = new HashMap<>();
+        try (CSVReader reader = new CSVReader(new FileReader(getServletContext().getRealPath(CSV_FILE_PATH)))) {
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                String foodItem = nextLine[0];
+                int calories = Integer.parseInt(nextLine[1]);
+                foodCaloriesMap.put(foodItem, calories);
+            }
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int totalCalories = 0;
+
+        String[] selectedFoods = request.getParameterValues("selectedFoods"); // Get selected food items
+        if (selectedFoods != null) {
+            for (String foodItem : selectedFoods) {
+                if (foodCaloriesMap.containsKey(foodItem)) {
+                    totalCalories += foodCaloriesMap.get(foodItem); // Add calories of selected food items
+                }
+            }
+        }
+
+        // Store or use the totalCalories as needed
+
+        response.sendRedirect(request.getContextPath() + "/caloriesServlet");
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+
+        out.println("<html><head><title>Calorie Counter</title></head><body>");
+        out.println("<h2>Select Food Items</h2>");
+
+        // Display sections for breakfast, lunch, dinner, and snack with food selection checkboxes
+        displayFoodSection(out, "Breakfast");
+        displayFoodSection(out, "Lunch");
+        displayFoodSection(out, "Dinner");
+        displayFoodSection(out, "Snack");
+
+        out.println("<input type='submit' value='Calculate Calories'>");
+        out.println("</form>");
+
+        out.println("</body></html>");
+    }
+
+    private void displayFoodSection(PrintWriter out, String sectionName) {
+        out.println("<h3>" + sectionName + "</h3>");
+        out.println("<form method='post'>");
+
+        for (String foodItem : foodCaloriesMap.keySet()) {
+            out.println("<input type='checkbox' name='selectedFoods' value='" + foodItem + "'>" + foodItem + "<br>");
+        }
+
+        out.println("</form>");
+        out.println("<br>");
+    }
+}

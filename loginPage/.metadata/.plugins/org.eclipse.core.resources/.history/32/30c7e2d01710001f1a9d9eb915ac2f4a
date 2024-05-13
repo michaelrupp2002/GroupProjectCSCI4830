@@ -1,0 +1,71 @@
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.sql.*;
+import java.util.*;
+import com.opencsv.CSVReader;
+
+@WebServlet("/calorieCounter")
+public class CalorieCounterServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    private static final String JDBC_URL = "jdbc:mysql://ec2-3-16-149-43.us-east-2.compute.amazonaws.com:3306/UserData";
+    private static final String JDBC_USER = "diethelper_remote";
+    private static final String JDBC_PASSWORD = "diethelper";
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String username = "username1"; // Set the username to "username1"
+        int totalCalories = 0;
+        
+        try (CSVReader reader = new CSVReader(new FileReader("path/to/your/csv/file.csv"))) {
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                String foodItem = nextLine[0];
+                int calories = Integer.parseInt(nextLine[1]);
+                
+                String value = request.getParameter(foodItem);
+                if (value != null && value.equals("1")) {
+                    totalCalories += calories;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD)) {
+            // Store totalCalories in the database or use as needed
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        response.sendRedirect(request.getContextPath() + "/calorieCounter");
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+
+        // Display form with food items and checkboxes for user selection
+        out.println("<html><head><title>Calorie Counter</title></head>");
+        out.println("<body>");
+        out.println("<h2>Food Items and Calorie Counter</h2>");
+        out.println("<form method='post'>");
+
+        try (CSVReader reader = new CSVReader(new FileReader("path/to/your/csv/file.csv"))) {
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                String foodItem = nextLine[0];
+                out.println("<input type='checkbox' name='" + foodItem + "' value='1'>" + foodItem + "<br>");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        out.println("<input type='submit' value='Calculate Total Calories'>");
+        out.println("</form>");
+        out.println("</body></html>");
+    }
+}

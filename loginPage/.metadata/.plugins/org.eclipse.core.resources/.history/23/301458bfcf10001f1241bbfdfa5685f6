@@ -1,0 +1,85 @@
+package registrationPage;
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.*;
+import java.util.*;
+import com.opencsv.CSVReader;
+
+@WebServlet("/caloriesData")
+public class caloriesData extends HttpServlet {
+    private ArrayList<String[]> caloriesData;
+    private int currentCaloriesIndex;
+
+    @Override
+    public void init() throws ServletException {
+        String caloriesFile = getServletContext().getRealPath("/WEB-INF/lib/caloriesData.csv");
+
+        caloriesData = new ArrayList<>();
+
+        try (CSVReader reader = new CSVReader(new FileReader(caloriesFile))) {
+            String[] line;
+            while ((line = reader.readNext()) != null) {
+                line[1] = line[1].replaceAll("cal", "");
+                caloriesData.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        String meal = request.getParameter("meal");
+
+        if (meal != null) {
+            out.println("<h2>" + meal + " Meal Options:</h2>");
+            out.println("<ul>");
+
+            int lowerBound = 0;
+            int upperBound = Integer.MAX_VALUE;
+
+            if (meal.equals("Low-calorie")) {
+                upperBound = 500;
+            } else if (meal.equals("Moderate-calorie")) {
+                lowerBound = 500;
+                upperBound = 800;
+            } else if (meal.equals("High-calorie")) {
+                lowerBound = 800;
+            } else {
+                out.println("Invalid meal choice.");
+                return;
+            }
+
+            for (String[] data : caloriesData) {
+                try {
+                    int calories = Integer.parseInt(data[1].trim().replaceAll("[^0-9]", ""));
+                    if (calories >= lowerBound && calories <= upperBound) {
+                        out.println("<li>" + data[0] + " - " + calories + " calories</li>");
+                    }
+                } catch (NumberFormatException e) {
+                    // Handle invalid calorie format
+                    out.println("<li>Invalid calorie format for: " + data[0] + "</li>");
+                }
+            }
+
+            out.println("</ul>");
+        } else {
+            out.println("No meal choice provided.");
+        }
+    }
+    
+		
+
+    
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	doGet(request, response);
+
+    }
+
+
+}

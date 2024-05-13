@@ -1,0 +1,179 @@
+
+package registrationPage;
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.sql.*;
+import java.util.*;
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="description" content="" />
+<meta name="author" content="" />
+<title>Diet Helpers Web</title>
+
+<!-- Favicon-->
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+
+	
+<!-- Core theme CSS (includes Bootstrap)-->
+<link href="css/index-styles.css" rel="stylesheet" />
+</head>
+<body id="page-top">
+	<!-- Navigation-->
+	<nav
+		class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top"
+		id="mainNav">
+		<div class="container">
+			<a class="navbar-brand" href="#page-top">Diet Helpers</a>
+			<button
+				class="navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded"
+				type="button" data-bs-toggle="collapse"
+				data-bs-target="#navbarResponsive" aria-controls="navbarResponsive"
+				aria-expanded="false" aria-label="Toggle navigation">
+				Menu <i class="fas fa-bars"></i>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarResponsive">
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item mx-0 mx-lg-1"><a
+						class="nav-link py-3 px-0 px-lg-3 rounded" href="#about">About</a></li>
+					<li class="nav-item mx-0 mx-lg-1"><a
+						class="nav-link py-3 px-0 px-lg-3 rounded" href="remindersServlet">Reminders</a></li>
+					<li class="nav-item mx-0 mx-lg-1"><a
+						class="nav-link py-3 px-0 px-lg-3 rounded" href="#">Calories Count</a></li>
+					<li class="nav-item mx-0 mx-lg-1"><a
+						class="nav-link py-3 px-0 px-lg-3 rounded" href="Logout">Logout</a></li>
+					<li class="nav-item mx-0 mx-lg-1 bg-danger"><a
+						class="nav-link py-3 px-0 px-lg-3 rounded"><%=session.getAttribute("name") %></a></li>
+					
+				</ul>
+			</div>
+		</div>
+	</nav>
+@WebServlet("/remindersServlet")
+public class remindersServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    // Database connection details
+    private static final String JDBC_URL = "jdbc:mysql://ec2-3-16-149-43.us-east-2.compute.amazonaws.com:3306/UserData";
+    private static final String JDBC_USER = "diethelper_remote";
+    private static final String JDBC_PASSWORD = "diethelper";
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Process form submission
+        String username = "username1"; // Set the username to "username1"
+        String[] remindersKeys = {"DrinkWater", "Eatmeal", "BrushTeeth", "Steps", "Exercise"};
+        Map<String, Integer> remindersMap = new HashMap<>();
+        for (String key : remindersKeys) {
+            String value = request.getParameter(key);
+            if (value != null && value.equals("1")) {
+                remindersMap.put(key, 1);
+            } else {
+                remindersMap.put(key, 0); // Mark as unchecked
+            }
+        }
+
+        // Store data in the database
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD)) {
+            String insertQuery = "INSERT INTO remindersData (username, DrinkWater, Eatmeal, BrushTeeth, Steps, Exercise) VALUES (?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                statement.setString(1, username);
+                for (int i = 0; i < remindersKeys.length; i++) {
+                    statement.setInt(i + 2, remindersMap.get(remindersKeys[i]));
+                }
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle exceptions
+        }
+        
+        // Redirect back to the page
+        response.sendRedirect(request.getContextPath() + "/reminders");
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+
+        // Database connection details
+        Connection connection = null;
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+
+            // Check if a previous entry exists for the username
+            String selectQuery = "SELECT * FROM remindersData WHERE username = ? ORDER BY id DESC LIMIT 1";
+            try (PreparedStatement statement = connection.prepareStatement(selectQuery)) {
+                statement.setString(1, "username1");
+                ResultSet resultSet = statement.executeQuery();
+                if (resultSet.next()) {
+
+                    out.println("<html><head><title>Reminders</title>");
+                    out.println("<style>");
+                    out.println("body { text-align: center; background-color: #32a852; }"); // Set the background color to the identified color
+                    out.println("h2 { text-align: center; }"); // Center align the h2 heading
+                    out.println(".centered { text-align: center; }"); // Center align the content within the div
+                    out.println("</style>");
+                    out.println("</head><body>");
+
+                    out.println("<div class='centered'>"); // Start of centered div
+                    out.println("<h2>Reminders for Today</h2>");
+                    out.println("<form method='post'>");
+                    out.println("<input type='hidden' name='username' value='username1'>");
+                    out.println("<input type='checkbox' name='DrinkWater' value='1' " + (resultSet.getInt("DrinkWater") == 1 ? "checked" : "") + "> Drink Water<br>");
+                    out.println("<input type='checkbox' name='Eatmeal' value='1' " + (resultSet.getInt("Eatmeal") == 1 ? "checked" : "") + "> Eat Meal<br>");
+                    out.println("<input type='checkbox' name='BrushTeeth' value='1' " + (resultSet.getInt("BrushTeeth") == 1 ? "checked" : "") + "> Brush Teeth<br>");
+                    out.println("<input type='checkbox' name='Steps' value='1' " + (resultSet.getInt("Steps") == 1 ? "checked" : "") + "> Take 10,000 Steps<br>");
+                    out.println("<input type='checkbox' name='Exercise' value='1' " + (resultSet.getInt("Exercise") == 1 ? "checked" : "") + "> Exercise<br>");
+                    out.println("<input type='submit' value='Submit'>");
+                    out.println("</form>");
+                    out.println("</div>"); // End of centered div
+                    out.println("</body></html>");
+                } else {
+                    // No existing entry found, display empty form
+                    out.println("<html><head><title>Reminders</title>");
+                    out.println("<style>");
+                    out.println("body { text-align: center; background-color: #32a852; }"); // Set the background color to the identified color
+                    out.println("h2 { text-align: center; }"); // Center align the h2 heading
+                    out.println(".centered { text-align: center; }"); // Center align the content within the div
+                    out.println("</style>");
+                    out.println("</head><body>");
+
+                    out.println("<div class='centered'>"); // Start of centered div
+                    out.println("<h2>Reminders for Today</h2>");
+                    out.println("<form method='post'>");
+                    out.println("<input type='hidden' name='username' value='username1'>");
+                    out.println("<input type='checkbox' name='DrinkWater' value='1'> Drink Water<br>");
+                    out.println("<input type='checkbox' name='Eatmeal' value='1'> Eat Meal<br>");
+                    out.println("<input type='checkbox' name='BrushTeeth' value='1'> Brush Teeth<br>");
+                    out.println("<input type='checkbox' name='Steps' value='1'> Take 10,000 Steps<br>");
+                    out.println("<input type='checkbox' name='Exercise' value='1'> Exercise<br>");
+                    out.println("<input type='submit' value='Submit'>");
+                    out.println("</form>");
+                    out.println("</div>"); // End of centered div
+                    out.println("</body></html>");
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}

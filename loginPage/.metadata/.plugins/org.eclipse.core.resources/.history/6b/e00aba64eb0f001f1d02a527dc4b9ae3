@@ -1,0 +1,176 @@
+
+package registrationPage;
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.sql.*;
+import java.util.*;
+
+
+@WebServlet("/remindersServlet")
+public class remindersServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    // Database connection details
+    private static final String JDBC_URL = "jdbc:mysql://ec2-3-16-149-43.us-east-2.compute.amazonaws.com:3306/UserData";
+    private static final String JDBC_USER = "diethelper_remote";
+    private static final String JDBC_PASSWORD = "diethelper";
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Process form submission
+        String username = "username1"; // Set the username to "username1"
+        String[] remindersKeys = {"DrinkWater", "Eatmeal", "BrushTeeth", "Steps", "Exercise"};
+        Map<String, Integer> remindersMap = new HashMap<>();
+        for (String key : remindersKeys) {
+            String value = request.getParameter(key);
+            if (value != null && value.equals("1")) {
+                remindersMap.put(key, 1);
+            } else {
+                remindersMap.put(key, 0); // Mark as unchecked
+            }
+        }
+
+        // Store data in the database
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD)) {
+            String insertQuery = "INSERT INTO remindersData (username, DrinkWater, Eatmeal, BrushTeeth, Steps, Exercise) VALUES (?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(insertQuery)) {
+                statement.setString(1, username);
+                for (int i = 0; i < remindersKeys.length; i++) {
+                    statement.setInt(i + 2, remindersMap.get(remindersKeys[i]));
+                }
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle exceptions
+        }
+        
+        // Redirect back to the page
+        response.sendRedirect(request.getContextPath() + "/reminders");
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+
+        // Database connection details
+        Connection connection = null;
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+
+            // Check if a previous entry exists for the username
+            String selectQuery = "SELECT * FROM remindersData WHERE username = ? ORDER BY id DESC LIMIT 1";
+            try (PreparedStatement statement = connection.prepareStatement(selectQuery)) {
+                statement.setString(1, "username1"); // Assuming "username1" is just a placeholder
+                ResultSet resultSet = statement.executeQuery();
+                if (resultSet.next()) {
+                    // Existing entry found, display form with pre-checked checkboxes\
+                	out.println("<!DOCTYPE html>\r\n"
+                			+ "<html lang=\"en\">\r\n"
+                			+ "<head>\r\n"
+                			+ "<meta charset=\"utf-8\" />\r\n"
+                			+ "<meta name=\"viewport\"\r\n"
+                			+ "	content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />\r\n"
+                			+ "<meta name=\"description\" content=\"\" />\r\n"
+                			+ "<meta name=\"author\" content=\"\" />\r\n"
+                			+ "<title>Diet Helpers Web</title>\r\n"
+                			+ "\r\n"
+                			+ "<!-- Favicon-->\r\n"
+                			+ "<link rel=\"icon\" type=\"image/x-icon\" href=\"assets/favicon.ico\" />\r\n"
+                			+ "\r\n"
+                			+ "	\r\n"
+                			+ "<!-- Core theme CSS (includes Bootstrap)-->\r\n"
+                			+ "<link href=\"css/index-styles.css\" rel=\"stylesheet\" />\r\n"
+                			+ "</head>\r\n"
+                			+ "<body id=\"page-top\">\r\n"
+                			+ "	<!-- Navigation-->\r\n"
+                			+ "	<nav\r\n"
+                			+ "		class=\"navbar navbar-expand-lg bg-secondary text-uppercase fixed-top\"\r\n"
+                			+ "		id=\"mainNav\">\r\n"
+                			+ "		<div class=\"container\">\r\n"
+                			+ "			<a class=\"navbar-brand\" href=\"#page-top\">Diet Helpers</a>\r\n"
+                			+ "			<button\r\n"
+                			+ "				class=\"navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded\"\r\n"
+                			+ "				type=\"button\" data-bs-toggle=\"collapse\"\r\n"
+                			+ "				data-bs-target=\"#navbarResponsive\" aria-controls=\"navbarResponsive\"\r\n"
+                			+ "				aria-expanded=\"false\" aria-label=\"Toggle navigation\">\r\n"
+                			+ "				Menu <i class=\"fas fa-bars\"></i>\r\n"
+                			+ "			</button>\r\n"
+                			+ "			<div class=\"collapse navbar-collapse\" id=\"navbarResponsive\">\r\n"
+                			+ "				<ul class=\"navbar-nav ms-auto\">\r\n"
+                			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+                			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"#about\">About</a></li>\r\n"
+                			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+                			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"remindersServlet\">Reminders</a></li>\r\n"
+                			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+                			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"#\">Calories Count</a></li>\r\n"
+                			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+                			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"Logout\">Logout</a></li>\r\n"
+                			+ "					<li class=\"nav-item mx-0 mx-lg-1 bg-danger\"><a\r\n"
+                			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\"href=\\\"Logout\\\">Logout</a></li>\\r\\n\"
+                			+ "					\r\n"
+                			+ "				</ul>\r\n"
+                			+ "			</div>\r\n"
+                			+ "		</div>\r\n"
+                			+ "	</nav>");
+                	out.println("<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+                			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"index.jsp\">Logout</a></li>");
+                    out.println("<html><head><title>Reminders</title></head>");
+                    out.println("<body style='text-align: center; background-color: #3cb371; margin-top: 150px;'>");
+                    out.println("<h2>Reminders for Today</h2>");
+                    // Display user's name from session if available
+                    String userName = (String) request.getSession().getAttribute("name");
+                    if(userName != null && !userName.isEmpty()) {
+                        out.println("<p>Hello, " + userName + "</p>");
+                    }
+                    out.println("<form method='post' style='display: inline-block; text-align: left;'>");
+                    out.println("<input type='hidden' name='username' value='username1'>");
+                    out.println("<input type='checkbox' name='DrinkWater' value='1' " + (resultSet.getInt("DrinkWater") == 1 ? "checked" : "") + "> Drink Water<br>");
+                    out.println("<input type='checkbox' name='Eatmeal' value='1' " + (resultSet.getInt("Eatmeal") == 1 ? "checked" : "") + "> Eat Meal<br>");
+                    out.println("<input type='checkbox' name='BrushTeeth' value='1' " + (resultSet.getInt("BrushTeeth") == 1 ? "checked" : "") + "> Brush Teeth<br>");
+                    out.println("<input type='checkbox' name='Steps' value='1' " + (resultSet.getInt("Steps") == 1 ? "checked" : "") + "> Take 10,000 Steps<br>");
+                    out.println("<input type='checkbox' name='Exercise' value='1' " + (resultSet.getInt("Exercise") == 1 ? "checked" : "") + "> Exercise<br>");
+                    out.println("<input type='submit' value='Submit'>");
+                    out.println("</form>");
+                    out.println("</body></html>");
+                } else {
+                    // No existing entry found, display empty form
+                    out.println("<html><head><title>Reminders</title></head>");
+                    out.println("<body style='text-align: center; background-color: #cdeccd; margin-top: 50px;'>");
+                    out.println("<h2>Reminders for Today</h2>");
+                    // Display user's name from session if available
+                    String userName = (String) request.getSession().getAttribute("name");
+                    if(userName != null && !userName.isEmpty()) {
+                        out.println("<p>Hello, " + userName + "</p>");
+                    }
+                    out.println("<form method='post' style='display: inline-block; text-align: left;'>");
+                    out.println("<input type='hidden' name='username' value='username1'>");
+                    out.println("<input type='checkbox' name='DrinkWater' value='1'> Drink Water<br>");
+                    out.println("<input type='checkbox' name='Eatmeal' value='1'> Eat Meal<br>");
+                    out.println("<input type='checkbox' name='BrushTeeth' value='1'> Brush Teeth<br>");
+                    out.println("<input type='checkbox' name='Steps' value='1'> Take 10,000 Steps<br>");
+                    out.println("<input type='checkbox' name='Exercise' value='1'> Exercise<br>");
+                    out.println("<input type='submit' value='Submit'>");
+                    out.println("</form>");
+                    out.println("</body></html>");
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}

@@ -1,0 +1,56 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("caloriesServlet")
+public class caloriesServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private HashMap<String, Double> foodCaloriesMap;
+
+    public caloriesServlet() {
+        super();
+        // Initialize foodCaloriesMap with data from CSV file
+        foodCaloriesMap = new HashMap<>();
+        loadDataFromCSV("path/to/your/csv/file.csv");
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String selectedFood = request.getParameter("food");
+        String section = request.getParameter("section");
+        double totalCalories = 0.0;
+
+        if (foodCaloriesMap.containsKey(selectedFood)) {
+            totalCalories = foodCaloriesMap.get(selectedFood);
+        }
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        out.println("<html><head><title>Calorie Calculator Result</title></head><body>");
+        out.println("<h1>Total Calories for " + selectedFood + ": " + totalCalories + "</h1>");
+        out.println("</body></html>");
+    }
+
+    private void loadDataFromCSV(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 2) {
+                    String food = parts[0].trim();
+                    double calorie = Double.parseDouble(parts[1].trim());
+                    foodCaloriesMap.put(food, calorie);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}

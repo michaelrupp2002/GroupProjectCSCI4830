@@ -40,6 +40,14 @@
 					<li class="nav-item mx-0 mx-lg-1"><a
 						class="nav-link py-3 px-0 px-lg-3 rounded" href="#about">About</a></li>
 					<li class="nav-item mx-0 mx-lg-1"><a
+						class="nav-link py-3 px-0 px-lg-3 rounded" href="reminders">Reminders</a></li>
+						
+						<li class="nav-item mx-0 mx-lg-1"><a
+					class="nav-link py-3 px-0 px-lg-3 rounded" href="calorieIntake.html">Recomendations</a></li>
+					<li class="nav-item mx-0 mx-lg-1"><a
+					
+						class="nav-link py-3 px-0 px-lg-3 rounded" href="dailyTracking.html">Daily Tracking</a></li>
+					<li class="nav-item mx-0 mx-lg-1"><a
 						class="nav-link py-3 px-0 px-lg-3 rounded" href="Logout">Logout</a></li>
 					<li class="nav-item mx-0 mx-lg-1 bg-danger"><a
 						class="nav-link py-3 px-0 px-lg-3 rounded"><%=session.getAttribute("name") %></a></li>
@@ -53,10 +61,7 @@
 		<div class="container d-flex align-items-center flex-column">
 			<!-- Diet Helpers Image-->
 			<img class="masthead-avatar mb-5" src="assets/img/dietHelper.PNG"
-				alt="..." />
-				
-			
-
+				alt="..." />	
 		</div>
 	</header>
 
@@ -77,10 +82,9 @@
 			
 			<!-- About Section Content-->
 			<div class="row">
-			<p class="text-center text-white">Diet Helpers an online nutrition planner app 
-		   </p>
+			<p class="text-center text-white">Diet Helpers an online nutrition planner app </p>
 			<p class="text-center text-white">that will help you plan meals and track</p>
-			<p class="text-center text-white">their macros.</p>
+			<p class="text-center text-white">their calories.</p>
 		
 
 		</div>
