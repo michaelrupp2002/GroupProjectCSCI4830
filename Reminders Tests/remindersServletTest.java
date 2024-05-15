@@ -14,7 +14,9 @@ import javax.servlet.ServletException;
 
 import org.junit.Test;
 
-import reminders.RemindersServlet;
+import Tests.HttpServletRequestStub;
+import Tests.HttpServletResponseStub;
+import registrationPage.remindersServlet;
 
 public class remindersServletTest {
 
@@ -33,7 +35,7 @@ public class remindersServletTest {
         remindersMap.put("Steps", 0);
         remindersMap.put("Exercise", 1);
 
-        RemindersServlet servlet = new RemindersServlet();
+        remindersServlet servlet = new remindersServlet();
         servlet.doGet(request, response);
 
         // Verify that the request attributes are set correctly
@@ -61,7 +63,7 @@ public class remindersServletTest {
         parameters.put("Exercise", new String[]{"1"});
         request.setParameters(parameters);
 
-        RemindersServlet servlet = new RemindersServlet();
+        remindersServlet servlet = new remindersServlet();
         servlet.doPost(request, response);
 
         // Add your assertions to validate the behavior after doPost is called
