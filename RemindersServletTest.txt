@@ -1,0 +1,131 @@
+import static org.junit.Assert.*;
+import org.junit.*;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import java.util.concurrent.TimeUnit;
+
+public class RemindersServletTest {
+    private WebDriver driver;
+    private String baseUrl;
+    private boolean acceptNextAlert = true;
+    private StringBuffer verificationErrors = new StringBuffer();
+
+    @Before
+    public void setUp() throws Exception {
+        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+        driver = new ChromeDriver();
+        baseUrl = "http://ec2-3-16-149-43.us-east-2.compute.amazonaws.com:8080/signup";
+        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testRemindersSave() throws Exception {
+        driver.get(baseUrl + "/login.jsp");
+        
+        driver.findElement(By.id("username")).clear();
+        driver.findElement(By.id("username")).sendKeys("testuser");
+        driver.findElement(By.id("password")).clear();
+        driver.findElement(By.id("password")).sendKeys("testpass");
+        driver.findElement(By.name("login")).click();
+
+        // Navigate to the reminders page
+        driver.get(baseUrl + "/reminders.jsp");
+
+        // Check checkboxes
+        WebElement drinkWaterCheckbox = driver.findElement(By.id("DrinkWater"));
+        if (!drinkWaterCheckbox.isSelected()) {
+            drinkWaterCheckbox.click();
+        }
+        WebElement eatMealCheckbox = driver.findElement(By.id("Eatmeal"));
+        if (!eatMealCheckbox.isSelected()) {
+            eatMealCheckbox.click();
+        }
+
+        // Submit the form
+        driver.findElement(By.id("submit")).click();
+
+        // Redirects back to the reminders page
+        driver.get(baseUrl + "/reminders.jsp");
+
+        // Verify the checkboxes are checked
+        assertTrue(driver.findElement(By.id("DrinkWater")).isSelected());
+        assertTrue(driver.findElement(By.id("Eatmeal")).isSelected());
+    }
+
+    @Test
+    public void testNavigationToIndex() throws Exception {
+        driver.get(baseUrl + "/login.jsp");
+        
+        driver.findElement(By.id("username")).clear();
+        driver.findElement(By.id("username")).sendKeys("testuser");
+        driver.findElement(By.id("password")).clear();
+        driver.findElement(By.id("password")).sendKeys("testpass");
+        driver.findElement(By.name("login")).click();
+
+        // Navigate to the reminders page
+        driver.get(baseUrl + "/reminders.jsp");
+
+        // Check checkboxes
+        WebElement drinkWaterCheckbox = driver.findElement(By.id("DrinkWater"));
+        if (!drinkWaterCheckbox.isSelected()) {
+            drinkWaterCheckbox.click();
+        }
+        WebElement eatMealCheckbox = driver.findElement(By.id("Eatmeal"));
+        if (!eatMealCheckbox.isSelected()) {
+            eatMealCheckbox.click();
+        }
+
+        // Submit the form
+        driver.findElement(By.id("submit")).click();
+
+        // Wait for redirection
+        Thread.sleep(2000); 
+
+        // Verify that the URL is the index page URL
+        String expectedUrl = baseUrl + "/index.jsp";
+        String actualUrl = driver.getCurrentUrl();
+        assertEquals(expectedUrl, actualUrl);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        driver.quit();
+        String verificationErrorString = verificationErrors.toString();
+        if (!"".equals(verificationErrorString)) {
+            fail(verificationErrorString);
+        }
+    }
+
+    private boolean isElementPresent(By by) {
+        try {
+            driver.findElement(by);
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    private boolean isAlertPresent() {
+        try {
+            driver.switchTo().alert();
+            return true;
+        } catch (NoAlertPresentException e) {
+            return false;
+        }
+    }
+
+    private String closeAlertAndGetItsText() {
+        try {
+            Alert alert = driver.switchTo().alert();
+            String alertText = alert.getText();
+            if (acceptNextAlert) {
+                alert.accept();
+            } else {
+                alert.dismiss();
+            }
+            return alertText;
+        } finally {
+            acceptNextAlert = true;
+        }
+    }
+}
