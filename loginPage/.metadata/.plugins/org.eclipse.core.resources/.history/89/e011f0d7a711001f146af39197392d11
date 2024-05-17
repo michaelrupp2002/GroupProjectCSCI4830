@@ -1,0 +1,55 @@
+package Tests;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.junit.*;
+
+public class remindersServletSeleniumTest {
+
+    private WebDriver driver;
+
+    @Before
+    public void setUp() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless"); // Run Chrome in headless mode
+        System.setProperty("webdriver.chrome.driver", "C:\\Program Files\\Google\\Chrome\\Application\\chromedriver.exe");
+        driver = new ChromeDriver(options);
+    }
+
+    @After
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+
+    @Test
+    public void testDoGet() {
+        driver.get("http://localhost:8080/Reminders");
+
+        Assert.assertTrue(driver.getCurrentUrl().endsWith("login.jsp"));
+    }
+
+    @Test
+    public void testDoPost() {
+        driver.get("http://localhost:8080/Reminders");
+
+     
+        WebElement usernameInput = driver.findElement(By.id("username"));
+        WebElement passwordInput = driver.findElement(By.id("password"));
+        WebElement loginButton = driver.findElement(By.id("loginButton"));
+        usernameInput.sendKeys("yourUsername");
+        passwordInput.sendKeys("yourPassword");
+        loginButton.click();
+
+        WebElement drinkWaterCheckbox = driver.findElement(By.name("DrinkWater"));
+        WebElement submitButton = driver.findElement(By.id("submitButton"));
+        drinkWaterCheckbox.click();
+        submitButton.click();
+
+        Assert.assertTrue(driver.getCurrentUrl().endsWith("Reminders"));
+    }
+}

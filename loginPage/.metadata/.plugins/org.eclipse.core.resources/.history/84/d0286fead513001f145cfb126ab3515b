@@ -1,0 +1,93 @@
+package registrationPage;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/BalancedDietServlet")
+public class BalancedDietServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        PrintWriter out = response.getWriter();
+        
+        // Set content type to text/html
+        response.setContentType("text/html");
+
+        // Output the initial HTML content
+        out.println("<!DOCTYPE html>");
+        out.println("<html lang=\"en\">");
+        out.println("<head>");
+        out.println("<meta charset=\"utf-8\" />");
+        out.println("<title>Diet Helpers Web</title>");
+        // Add any additional CSS or JS links here
+        out.println("</head>");
+        out.println("<body>");
+
+        // Handle form submission and calculate total calories
+        int fruitServings = Integer.parseInt(request.getParameter("fruit"));
+        int vegetableServings = Integer.parseInt(request.getParameter("vegetable"));
+        int proteinServings = Integer.parseInt(request.getParameter("protein"));
+        int grainsServings = Integer.parseInt(request.getParameter("grains"));
+        int dairyServings = Integer.parseInt(request.getParameter("dairy"));
+
+        int totalCalories = calculateTotalCalories(fruitServings, vegetableServings, proteinServings, grainsServings, dairyServings);
+        boolean isBalanced = isDietBalanced(totalCalories);
+
+        // Display the result
+        out.println("<h1>Results</h1>");
+        out.println("<p>Total Calories: " + totalCalories + "</p>");
+        out.println("<p>Is Diet Balanced: " + (isBalanced ? "Yes" : "No") + "</p>");
+
+        // Close the HTML tags
+        out.println("</body>");
+        out.println("</html>");
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Display a form for users to input their dietary information
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html lang=\"en\">");
+        out.println("<head>");
+        out.println("<meta charset=\"utf-8\" />");
+        out.println("<title>Diet Helpers Web</title>");
+        // Add any additional CSS or JS links here
+        out.println("</head>");
+        out.println("<body>");
+
+        out.println("<h1>Diet Balancer</h1>");
+        out.println("<form method='post'>");
+        out.println("Fruit Servings: <input type='text' name='fruit'><br>");
+        out.println("Vegetable Servings: <input type='text' name='vegetable'><br>");
+        out.println("Protein Servings: <input type='text' name='protein'><br>");
+        out.println("Grains Servings: <input type='text' name='grains'><br>");
+        out.println("Dairy Servings: <input type='text' name='dairy'><br>");
+        out.println("<input type='submit' value='Calculate'>");
+        out.println("</form>");
+
+         // Close the HTML tags
+         out.println("</body>");
+         out.println("</html>");
+    }
+
+    private int calculateTotalCalories(int fruitServings, int vegetableServings, int proteinServings, int grainsServings, int dairyServings) {
+         int fruitCalories = fruitServings * 50;
+         int vegetableCalories = vegetableServings * 30;
+         int proteinCalories = proteinServings * 100;
+         int grainsCalories = grainsServings * 70;
+         int dairyCalories = dairyServings * 80;
+         return fruitCalories + vegetableCalories + proteinCalories + grainsCalories + dairyCalories;
+     }
+
+     private boolean isDietBalanced(int totalCalories) {
+         return totalCalories >= 2000 && totalCalories <= 2500;
+     }
+}

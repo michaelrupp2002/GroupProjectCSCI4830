@@ -75,6 +75,8 @@ public class caloriesData extends HttpServlet {
     			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
     			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"dailyTracking.html\">Daily Tracking</a></li>\r\n"
     			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+    			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"/registrationPage/BalancedDietServlet\">Diet Balance</a></li>\r\n"
+    			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
     			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"Logout\">Logout</a></li>\r\n"
     			+ "					<li class=\"nav-item mx-0 mx-lg-1 bg-danger\"><a\r\n"
     			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"index.jsp\">Home</a><li>\r\n"

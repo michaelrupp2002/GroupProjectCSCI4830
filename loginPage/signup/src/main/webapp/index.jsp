@@ -38,19 +38,22 @@
 			<div class="collapse navbar-collapse" id="navbarResponsive">
 				<ul class="navbar-nav ms-auto">
 					<li class="nav-item mx-0 mx-lg-1"><a
-						class="nav-link py-3 px-0 px-lg-3 rounded" href="#about">About</a></li>
+						class="nav-link py-3 px-0 px-lg-3 rounded" id="About" href="#about">About</a></li>
 					<li class="nav-item mx-0 mx-lg-1"><a
-						class="nav-link py-3 px-0 px-lg-3 rounded" href="reminders">Reminders</a></li>
+						class="nav-link py-3 px-0 px-lg-3 rounded" id="Reminder" href="reminders">Reminders</a></li>
 						
 						<li class="nav-item mx-0 mx-lg-1"><a
-					class="nav-link py-3 px-0 px-lg-3 rounded" href="calorieIntake.html">Recomendations</a></li>
+					class="nav-link py-3 px-0 px-lg-3 rounded" id="Recommendation" href="calorieIntake.html">Recommendations</a></li>
 					<li class="nav-item mx-0 mx-lg-1"><a
 					
-						class="nav-link py-3 px-0 px-lg-3 rounded" href="dailyTracking.html">Daily Tracking</a></li>
+						class="nav-link py-3 px-0 px-lg-3 rounded" id="Daily" href="dailyTracking.html">Daily Tracking</a></li>
 					<li class="nav-item mx-0 mx-lg-1"><a
-						class="nav-link py-3 px-0 px-lg-3 rounded" href="Logout">Logout</a></li>
+					
+						class="nav-link py-3 px-0 px-lg-3 rounded" id="Daily" href="BalancedDietServlet">Diet Balance</a></li>
+					<li class="nav-item mx-0 mx-lg-1"><a
+						class="nav-link py-3 px-0 px-lg-3 rounded" id="Logout" href="Logout">Logout</a></li>
 					<li class="nav-item mx-0 mx-lg-1 bg-danger"><a
-						class="nav-link py-3 px-0 px-lg-3 rounded"><%=session.getAttribute("name") %></a></li>
+						class="nav-link py-3 px-0 px-lg-3 rounded" id="name"><%=session.getAttribute("name") %></a></li>
 					
 				</ul>
 			</div>

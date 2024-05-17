@@ -1,0 +1,182 @@
+package registrationPage;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/BalancedDietServlet")
+public class BalancedDietServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        PrintWriter out = response.getWriter();
+        
+        // Set content type to text/html
+        response.setContentType("text/html");
+
+        // Output the initial HTML content
+    	out.println("<!DOCTYPE html>\r\n"
+    			+ "<html lang=\"en\">\r\n"
+    			+ "<head>\r\n"
+    			+ "<meta charset=\"utf-8\" />\r\n"
+    			+ "<meta name=\"viewport\"\r\n"
+    			+ "	content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />\r\n"
+    			+ "<meta name=\"description\" content=\"\" />\r\n"
+    			+ "<meta name=\"author\" content=\"\" />\r\n"
+    			+ "<title>Diet Helpers Web</title>\r\n"
+    			+ "\r\n"
+    			+ "<!-- Favicon-->\r\n"
+    			+ "<link rel=\"icon\" type=\"image/x-icon\" href=\"assets/favicon.ico\" />\r\n"
+    			+ "\r\n"
+    			+ "	\r\n"
+    			+ "<!-- Core theme CSS (includes Bootstrap)-->\r\n"
+    			+ "<link href=\"css/index-styles.css\" rel=\"stylesheet\" />\r\n"
+    			+ "</head>\r\n"
+    			+ "<body id=\"page-top\">\r\n"
+    			+ "	<!-- Navigation-->\r\n"
+    			+ "	<nav\r\n"
+    			+ "		class=\"navbar navbar-expand-lg bg-secondary text-uppercase fixed-top\"\r\n"
+    			+ "		id=\"mainNav\">\r\n"
+    			+ "		<div class=\"container\">\r\n"
+    			+ "			<a class=\"navbar-brand\" href=\"#page-top\">Diet Helpers</a>\r\n"
+    			+ "			<button\r\n"
+    			+ "				class=\"navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded\"\r\n"
+    			+ "				type=\"button\" data-bs-toggle=\"collapse\"\r\n"
+    			+ "				data-bs-target=\"#navbarResponsive\" aria-controls=\"navbarResponsive\"\r\n"
+    			+ "				aria-expanded=\"false\" aria-label=\"Toggle navigation\">\r\n"
+    			+ "				Menu <i class=\"fas fa-bars\"></i>\r\n"
+    			+ "			</button>\r\n"
+    			+ "			<div class=\"collapse navbar-collapse\" id=\"navbarResponsive\">\r\n"
+    			+ "				<ul class=\"navbar-nav ms-auto\">\r\n"
+    			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+
+    			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"reminders\">Reminders</a></li>\r\n"
+    			+ "<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+    			+ "					class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"calorieIntake.html\">Recomendations</a></li>"
+    			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+    			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"dailyTracking.html\">Daily Tracking</a></li>\r\n"
+    			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+    			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"Logout\">Logout</a></li>\r\n"
+    			+ "					<li class=\"nav-item mx-0 mx-lg-1 bg-danger\"><a\r\n"
+    			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"index.jsp\">Home</a><li>\r\n"
+    			+ "					\r\n"
+    			+ "				</ul>\r\n"
+    			+ "			</div>\r\n"
+    			+ "		</div>\r\n"
+    			+ "	</nav>");
+
+
+        // Handle form submission and calculate total calories
+        int fruitServings = Integer.parseInt(request.getParameter("fruit"));
+        int vegetableServings = Integer.parseInt(request.getParameter("vegetable"));
+        int proteinServings = Integer.parseInt(request.getParameter("protein"));
+        int grainsServings = Integer.parseInt(request.getParameter("grains"));
+        int dairyServings = Integer.parseInt(request.getParameter("dairy"));
+
+        int totalCalories = calculateTotalCalories(fruitServings, vegetableServings, proteinServings, grainsServings, dairyServings);
+        boolean isBalanced = isDietBalanced(totalCalories);
+
+        // Display the result
+        out.println("<h1>Results</h1>");
+        out.println("<p>Total Calories: " + totalCalories + "</p>");
+        out.println("<p>Is Diet Balanced: " + (isBalanced ? "Yes" : "No") + "</p>");
+
+        // Close the HTML tags
+        out.println("</body>");
+        out.println("</html>");
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Display a form for users to input their dietary information
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        // Output the initial HTML content
+    	out.println("<!DOCTYPE html>\r\n"
+    			+ "<html lang=\"en\">\r\n"
+    			+ "<head>\r\n"
+    			+ "<meta charset=\"utf-8\" />\r\n"
+    			+ "<meta name=\"viewport\"\r\n"
+    			+ "	content=\"width=device-width, initial-scale=1, shrink-to-fit=no\" />\r\n"
+    			+ "<meta name=\"description\" content=\"\" />\r\n"
+    			+ "<meta name=\"author\" content=\"\" />\r\n"
+    			+ "<title>Diet Helpers Web</title>\r\n"
+    			+ "\r\n"
+    			+ "<!-- Favicon-->\r\n"
+    			+ "<link rel=\"icon\" type=\"image/x-icon\" href=\"assets/favicon.ico\" />\r\n"
+    			+ "\r\n"
+    			+ "	\r\n"
+    			+ "<!-- Core theme CSS (includes Bootstrap)-->\r\n"
+    			+ "<link href=\"css/index-styles.css\" rel=\"stylesheet\" />\r\n"
+    			+ "</head>\r\n"
+    			+ "<body id=\"page-top\">\r\n"
+    			+ "	<!-- Navigation-->\r\n"
+    			+ "	<nav\r\n"
+    			+ "		class=\"navbar navbar-expand-lg bg-secondary text-uppercase fixed-top\"\r\n"
+    			+ "		id=\"mainNav\">\r\n"
+    			+ "		<div class=\"container\">\r\n"
+    			+ "			<a class=\"navbar-brand\" href=\"#page-top\">Diet Helpers</a>\r\n"
+    			+ "			<button\r\n"
+    			+ "				class=\"navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded\"\r\n"
+    			+ "				type=\"button\" data-bs-toggle=\"collapse\"\r\n"
+    			+ "				data-bs-target=\"#navbarResponsive\" aria-controls=\"navbarResponsive\"\r\n"
+    			+ "				aria-expanded=\"false\" aria-label=\"Toggle navigation\">\r\n"
+    			+ "				Menu <i class=\"fas fa-bars\"></i>\r\n"
+    			+ "			</button>\r\n"
+    			+ "			<div class=\"collapse navbar-collapse\" id=\"navbarResponsive\">\r\n"
+    			+ "				<ul class=\"navbar-nav ms-auto\">\r\n"
+    			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+
+    			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"reminders\">Reminders</a></li>\r\n"
+    			+ "<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+    			+ "					class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"calorieIntake.html\">Recomendations</a></li>"
+    			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+    			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"dailyTracking.html\">Daily Tracking</a></li>\r\n"
+    			+ "					<li class=\"nav-item mx-0 mx-lg-1\"><a\r\n"
+    			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"Logout\">Logout</a></li>\r\n"
+    			+ "					<li class=\"nav-item mx-0 mx-lg-1 bg-danger\"><a\r\n"
+    			+ "						class=\"nav-link py-3 px-0 px-lg-3 rounded\" href=\"index.jsp\">Home</a><li>\r\n"
+    			+ "					\r\n"
+    			+ "				</ul>\r\n"
+    			+ "			</div>\r\n"
+    			+ "		</div>\r\n"
+    			+ "	</nav>");
+        out.println("<br>");
+        out.println("<br>");
+        out.println("<br>");
+        out.println("<br>");
+        out.println("<br>");
+
+        out.println("<h1>Diet Balancer</h1>");
+        out.println("<form method='post'>");
+        out.println("Fruit Servings: <input type='text' name='fruit'><br>");
+        out.println("Vegetable Servings: <input type='text' name='vegetable'><br>");
+        out.println("Protein Servings: <input type='text' name='protein'><br>");
+        out.println("Grains Servings: <input type='text' name='grains'><br>");
+        out.println("Dairy Servings: <input type='text' name='dairy'><br>");
+        out.println("<input type='submit' value='Calculate'>");
+        out.println("</form>");
+
+         // Close the HTML tags
+         out.println("</body>");
+         out.println("</html>");
+    }
+
+    private int calculateTotalCalories(int fruitServings, int vegetableServings, int proteinServings, int grainsServings, int dairyServings) {
+         int fruitCalories = fruitServings * 50;
+         int vegetableCalories = vegetableServings * 30;
+         int proteinCalories = proteinServings * 100;
+         int grainsCalories = grainsServings * 70;
+         int dairyCalories = dairyServings * 80;
+         return fruitCalories + vegetableCalories + proteinCalories + grainsCalories + dairyCalories;
+     }
+
+     private boolean isDietBalanced(int totalCalories) {
+         return totalCalories >= 2000 && totalCalories <= 2500;
+     }
+}
