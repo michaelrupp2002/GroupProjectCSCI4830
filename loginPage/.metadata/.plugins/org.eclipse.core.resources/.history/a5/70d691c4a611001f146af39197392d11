@@ -1,0 +1,35 @@
+package registrationPage;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import javax.servlet.ServletContext;
+
+import org.junit.Test;
+
+public class testCaloriesDataInitialization {
+
+    @Test
+    public void testCaloriesDataInitialization() {
+        // Create a mock ServletContext
+        ServletContext servletContext = mock(ServletContext.class);
+        
+        // Create an instance of the caloriesData servlet
+        caloriesData servlet = new caloriesData();
+        
+        // Initialize the servlet with the mock ServletContext
+        try {
+            servlet.init(servletContext);
+        } catch (Exception e) {
+            // Handle any exceptions thrown during initialization
+            e.printStackTrace();
+        }
+        
+        // Add your assertions to check if the calories data is initialized correctly
+        assertNotNull("Calories data should not be null", servlet.testCaloriesDataInitialization );
+        assertTrue("Calories data list should not be empty", !servlet.caloriesData.isEmpty());
+    }
+}
